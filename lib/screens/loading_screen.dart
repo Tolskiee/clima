@@ -1,6 +1,11 @@
+import 'package:clima/screens/location_screen.dart';
+import 'package:clima/services/networking.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:clima/services/location.dart';
+import 'package:clima/screens/location_screen.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'location_screen.dart';
+import 'package:clima/services/weather.dart';
 
 class LoadingScreen extends StatefulWidget {
   @override
@@ -8,28 +13,31 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  @override
   void initState() {
     super.initState();
-    getLocation();
+    getlocationData();
   }
 
-  void checkPermission(Permission permission) async {
-    var status = await permission.status;
-    if (status.isDenied) {
-      await permission.request();
-    }
+  void getlocationData() async {
+    var weatherData = await WeatherModel().getLocationWeather();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (content) {
+          return LocationScreen(weatherData);
+        },
+      ),
+    );
   }
 
-  void getLocation() async {
-    checkPermission(Permission.location);
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.low);
-    print(position);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Scaffold(
+      body: Center(
+        child: SpinKitFadingFour(
+          color: Colors.white,
+          size: 100.0,
+        ),
+      ),
+    );
   }
 }
